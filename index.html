@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeLink AI – Phishing URL Detection</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       CYBER BACKGROUND CANVAS
+  ═══════════════════════════════════════════ -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- ═══════════════════════════════════════════
+       NAVIGATION / HEADER
+  ═══════════════════════════════════════════ -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="shield-icon">
+        <svg viewBox="0 0 40 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 2L4 9V22C4 31.4 11.1 40.2 20 43C28.9 40.2 36 31.4 36 22V9L20 2Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M14 22L18 26L27 17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">SafeLink<span class="accent"> AI</span></span>
+        <span class="brand-tagline">Detect Suspicious Links Before They Become Threats</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="#scanner" class="nav-link active" data-tooltip="URL Scanner">Scanner</a>
+      <a href="#dashboard" class="nav-link" data-tooltip="Stats Dashboard">Dashboard</a>
+      <a href="#history" class="nav-link" data-tooltip="Scan History">History</a>
+      <a href="#awareness" class="nav-link" data-tooltip="Learn about phishing">Awareness</a>
+    </nav>
+
+    <div class="nav-actions">
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" data-tooltip="Toggle dark/light mode">
+        <div class="toggle-track">
+          <span class="toggle-icon moon">🌙</span>
+          <span class="toggle-icon sun">☀️</span>
+          <div class="toggle-thumb"></div>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       HERO / SCANNER SECTION
+  ═══════════════════════════════════════════ -->
+  <main>
+    <section id="scanner" class="section hero-section">
+      <div class="container">
+        <div class="hero-headline">
+          <div class="status-badge pulse-badge">
+            <span class="status-dot"></span>
+            AI Engine Online
+          </div>
+          <h1 class="hero-title">
+            Is This URL <span class="gradient-text">Safe?</span>
+          </h1>
+          <p class="hero-sub">Paste any suspicious link below. SafeLink AI runs 12 security checks in real-time and gives you an instant threat assessment.</p>
+        </div>
+
+        <!-- URL Input Card -->
+        <div class="scanner-card glass-card">
+          <div class="input-wrapper" id="inputWrapper">
+            <div class="input-prefix">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+            </div>
+            <input
+              type="url"
+              id="urlInput"
+              class="url-input"
+              placeholder="https://suspicious-example.com/login?verify=true"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="clear-btn" id="clearBtn" aria-label="Clear input" title="Clear">✕</button>
+          </div>
+          <div class="error-msg" id="errorMsg">
+            <span>⚠️</span> Please enter a valid URL to scan.
+          </div>
+
+          <div class="scanner-actions">
+            <button class="scan-btn" id="scanBtn">
+              <span class="btn-icon">🛡️</span>
+              <span class="btn-text">Scan Now</span>
+              <div class="btn-ripple"></div>
+            </button>
+            <button class="example-btn" id="exampleBtn" data-tooltip="Load a sample phishing URL">
+              Try Example
+            </button>
+          </div>
+
+          <div class="scan-hints">
+            <span>💡 Tip: Press <kbd>Enter</kbd> to scan</span>
+            <span>•</span>
+            <span>Checks HTTPS, keywords, IP usage, subdomain depth &amp; more</span>
+          </div>
+        </div>
+
+        <!-- ── SCANNING ANIMATION ── -->
+        <div class="scanning-overlay" id="scanningOverlay">
+          <div class="scan-animation">
+            <div class="scan-rings">
+              <div class="ring ring-1"></div>
+              <div class="ring ring-2"></div>
+              <div class="ring ring-3"></div>
+              <div class="scan-core">
+                <svg viewBox="0 0 40 46" fill="none">
+                  <path d="M20 2L4 9V22C4 31.4 11.1 40.2 20 43C28.9 40.2 36 31.4 36 22V9L20 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="scan-log" id="scanLog">
+              <p class="log-line active" id="log1">▶ Initializing SafeLink AI engine…</p>
+              <p class="log-line" id="log2">▶ Parsing URL structure…</p>
+              <p class="log-line" id="log3">▶ Checking HTTPS certificate…</p>
+              <p class="log-line" id="log4">▶ Scanning for phishing keywords…</p>
+              <p class="log-line" id="log5">▶ Analyzing domain reputation…</p>
+              <p class="log-line" id="log6">▶ Generating threat report…</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── RESULTS SECTION ── -->
+        <div class="results-section" id="resultsSection">
+
+          <!-- Score + Status -->
+          <div class="results-grid">
+            <div class="score-card glass-card">
+              <h3 class="card-label">AI Security Score</h3>
+              <div class="score-ring-wrap">
+                <svg class="score-ring" viewBox="0 0 120 120">
+                  <circle class="ring-track" cx="60" cy="60" r="50"/>
+                  <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+                </svg>
+                <div class="score-center">
+                  <span class="score-number" id="scoreNumber">0</span>
+                  <span class="score-label">/100</span>
+                </div>
+              </div>
+              <div class="status-badge-result" id="statusBadge">—</div>
+              <p class="risk-level-label">Risk Level: <strong id="riskLevelText">—</strong></p>
+            </div>
+
+            <!-- Threat Analysis -->
+            <div class="threat-card glass-card">
+              <h3 class="card-label">Threat Analysis</h3>
+              <ul class="threat-list" id="threatList">
+                <!-- Populated by JS -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- AI Recommendations -->
+          <div class="recommend-card glass-card" id="recommendCard">
+            <h3 class="card-label">🤖 AI Recommendations</h3>
+            <div class="recommend-grid" id="recommendGrid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Report Actions -->
+          <div class="report-actions glass-card">
+            <h3 class="card-label">📄 Report</h3>
+            <div class="report-btns">
+              <button class="action-btn download-btn" id="downloadBtn" data-tooltip="Save as .txt file">
+                <span>⬇</span> Download Report
+              </button>
+              <button class="action-btn print-btn" id="printBtn" data-tooltip="Print this report">
+                <span>🖨</span> Print Report
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /results-section -->
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECURITY DASHBOARD
+    ═══════════════════════════════════════════ -->
+    <section id="dashboard" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Security <span class="gradient-text">Dashboard</span></h2>
+          <p class="section-sub">Your cumulative scan statistics at a glance.</p>
+        </div>
+
+        <div class="dash-grid">
+          <div class="dash-card glass-card" data-color="blue">
+            <div class="dash-icon">🔍</div>
+            <div class="dash-info">
+              <span class="dash-value" id="totalScans">0</span>
+              <span class="dash-label">Total Scans</span>
+            </div>
+          </div>
+          <div class="dash-card glass-card" data-color="green">
+            <div class="dash-icon">✅</div>
+            <div class="dash-info">
+              <span class="dash-value" id="safeCount">0</span>
+              <span class="dash-label">Safe Websites</span>
+            </div>
+          </div>
+          <div class="dash-card glass-card" data-color="yellow">
+            <div class="dash-icon">⚠️</div>
+            <div class="dash-info">
+              <span class="dash-value" id="suspiciousCount">0</span>
+              <span class="dash-label">Suspicious</span>
+            </div>
+          </div>
+          <div class="dash-card glass-card" data-color="red">
+            <div class="dash-icon">🚨</div>
+            <div class="dash-info">
+              <span class="dash-value" id="highRiskCount">0</span>
+              <span class="dash-label">High Risk</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk Meter -->
+        <div class="meter-card glass-card">
+          <h3 class="card-label">Overall Threat Meter</h3>
+          <div class="risk-meter">
+            <div class="meter-bar">
+              <div class="meter-fill" id="meterFill"></div>
+              <div class="meter-labels">
+                <span>Safe</span><span>Suspicious</span><span>High Risk</span>
+              </div>
+            </div>
+          </div>
+          <p class="meter-note" id="meterNote">No scans yet. Start by analyzing a URL above.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SCAN HISTORY
+    ═══════════════════════════════════════════ -->
+    <section id="history" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Scan <span class="gradient-text">History</span></h2>
+          <p class="section-sub">Recent URLs analyzed by SafeLink AI (stored locally in your browser).</p>
+        </div>
+        <div class="history-controls">
+          <button class="action-btn" id="clearHistoryBtn" data-tooltip="Delete all history">🗑 Clear History</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="empty-state" id="emptyHistory">
+            <div class="empty-icon">📋</div>
+            <p>No scans yet. Analyze a URL to get started.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         PHISHING AWARENESS
+    ═══════════════════════════════════════════ -->
+    <section id="awareness" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Phishing <span class="gradient-text">Awareness</span></h2>
+          <p class="section-sub">Common attack vectors you should recognise.</p>
+        </div>
+
+        <div class="awareness-grid">
+          <div class="aware-card glass-card">
+            <div class="aware-icon">🎭</div>
+            <h4>Fake Login Pages</h4>
+            <p>Attackers clone real banking or social-media login pages pixel-for-pixel, then harvest your credentials the moment you type them in.</p>
+          </div>
+          <div class="aware-card glass-card">
+            <div class="aware-icon">📧</div>
+            <h4>Suspicious Emails</h4>
+            <p>Phishing emails spoof trusted senders, create urgency ("Your account will be closed!"), and embed links to malicious sites.</p>
+          </div>
+          <div class="aware-card glass-card">
+            <div class="aware-icon">🎁</div>
+            <h4>Fake Rewards &amp; Prizes</h4>
+            <p>"You've won an iPhone!" scams lure victims into submitting personal details or credit card numbers to claim a prize that never arrives.</p>
+          </div>
+          <div class="aware-card glass-card">
+            <div class="aware-icon">🔗</div>
+            <h4>Shortened URLs</h4>
+            <p>Bit.ly-style links hide the true destination. Always expand a short URL before clicking, especially in unsolicited messages.</p>
+          </div>
+          <div class="aware-card glass-card">
+            <div class="aware-icon">🧠</div>
+            <h4>Social Engineering</h4>
+            <p>Attackers impersonate colleagues, tech support, or executives to manipulate people into revealing passwords or transferring funds.</p>
+          </div>
+          <div class="aware-card glass-card">
+            <div class="aware-icon">📱</div>
+            <h4>Smishing (SMS Phishing)</h4>
+            <p>Text messages pretending to be delivery companies or banks direct victims to fraudulent websites via embedded links.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-name small">SafeLink<span class="accent"> AI</span></span>
+        <span class="footer-note">For educational purposes only. Always consult cybersecurity professionals for production security.</span>
+      </div>
+      <div class="footer-copy">© 2025 SafeLink AI — Stay Cyber Safe</div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-top" id="backTop" aria-label="Back to top" data-tooltip="Back to top">▲</button>
+
+  <!-- Success / Info Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
